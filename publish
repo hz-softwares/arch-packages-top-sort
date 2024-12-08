@@ -1,0 +1,4 @@
+#!/usr/bin/zsh
+
+docker build . -t hadyelzayady1996/light-app-topological-sort:latest && docker push hadyelzayady1996/light-app-topological-sort:latest
+
