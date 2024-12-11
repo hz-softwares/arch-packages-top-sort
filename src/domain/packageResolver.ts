@@ -11,6 +11,7 @@ export async function getPackageDependencyTopSort(packageName: string) {
   const sortedDependencies = sorting.topSort(dependencies.getData());
   return sortedDependencies;
 }
+const packageDependencyResolver = createPackageDependencyResolver();
 export async function resolvePackageDependenciesNested(
   packageName: string,
 ): Promise<Tree> {
@@ -18,7 +19,6 @@ export async function resolvePackageDependenciesNested(
   const queue: { path: string; name: string }[] = [
     { path: "", name: packageName },
   ];
-  const packageDependencyResolver = createPackageDependencyResolver();
   while (queue.length > 0) {
     // console.log("queue", queue);
     const batchDependencies = queue.splice(0, BATTCH_SIZE);
