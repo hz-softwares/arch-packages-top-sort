@@ -1,4 +1,10 @@
 #!/usr/bin/zsh
 
+source ~/.config/zsh/.zshenv
+
 docker build . -t hadyelzayady1996/light-app-topological-sort:latest && docker push hadyelzayady1996/light-app-topological-sort:latest
 
+kitten ssh admin@$LIGHT_APP_EC2_URL -t "mkdir services/arch-packages-top-sort"
+
+scp  ./compose.yaml admin@$LIGHT_APP_EC2_URL:/home/admin/services/arch-packages-top-sort/
+kitten ssh admin@$LIGHT_APP_EC2_URL -t "cd services/arch-packages-top-sort && docker compose pull && docker compose up -d"

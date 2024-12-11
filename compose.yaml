@@ -1,0 +1,12 @@
+version: '3'
+services:
+  arch-packages-top-sort:
+    image: hadyelzayady1996/light-app-topological-sort:latest
+    container_name: top_sort
+    networks:
+      - reverse-proxy
+
+networks:
+  reverse-proxy:
+    name: reverse-proxy
+    external: true

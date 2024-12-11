@@ -3,8 +3,8 @@ import { dependencyResolver } from "./controllers/dependencyResolver";
 import { cors } from "@elysiajs/cors";
 
 const app = new Elysia()
-  .onError(({ set, code, error }) => {
-    console.log("err");
+  .onError(({ set, code, error, ...rest }) => {
+    console.log("err", error, rest);
     return new Response(error.toString(), { status: 500 });
   })
   .use(cors())
