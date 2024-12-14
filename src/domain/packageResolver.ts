@@ -1,13 +1,12 @@
 import sorting from "../algorithms/sorting";
 import { ARCH_SEARCH_URL } from "../constants/archapi";
 import { ArchPackageSearchResource } from "../types/Arch";
-import { PATH_DELIM, Tree, constructPath, createTree } from "../types/Tree";
+import { Tree, constructPath, createTree } from "../types/Tree";
 import { isEmptyString } from "../utils/string.utils";
 
 const BATTCH_SIZE = 1;
 export async function getPackageDependencyTopSort(packageName: string) {
   const dependencies = await resolvePackageDependenciesNested(packageName);
-  // console.log(dependencies);
   const sortedDependencies = sorting.topSort(dependencies.getData());
   return sortedDependencies;
 }
@@ -19,10 +18,9 @@ export async function resolvePackageDependenciesNested(
   const queue: { path: string; name: string }[] = [
     { path: "", name: packageName },
   ];
+  const promises: Promise<void>[] = [];
   while (queue.length > 0) {
-    // console.log("queue", queue);
     const batchDependencies = queue.splice(0, BATTCH_SIZE);
-    const promises: Promise<void>[] = [];
     batchDependencies.forEach((currentDependency) => {
       const currentParentPath = constructPath([
         currentDependency.path,
@@ -34,7 +32,6 @@ export async function resolvePackageDependenciesNested(
             if (dependencies.length === 0) {
               return;
             }
-            // console.log("dependencies", dependencies);
             dependencyTree.addNode(currentParentPath, dependencies);
             queue.push(
               ...dependencies.map((d) => ({
@@ -46,10 +43,8 @@ export async function resolvePackageDependenciesNested(
         ),
       );
     });
-    await Promise.all(promises);
   }
-  // const result = await Promise.all(promises);
-  // console.log("result", result);
+  await Promise.all(promises);
   return dependencyTree;
 }
 
@@ -57,12 +52,9 @@ function createPackageDependencyResolver() {
   const cache = new Map<string, string[]>();
   return async (packageName: string): Promise<string[]> => {
     if (cache.has(packageName)) {
-      // console.log("cache hit", packageName);
       return cache.get(packageName) as string[];
     }
-    // console.log("cache miss", packageName);
     const dependencies = await resolvePackageDependencies(packageName);
-    console.log(dependencies);
     cache.set(packageName, dependencies);
     return dependencies;
   };
@@ -75,11 +67,8 @@ function getPackgeName(name: string) {
 }
 
 export async function resolvePackageDependencies(packageName: string) {
-  console.log('fetch', packageName)
   try {
-
     const result = await fetch(`${ARCH_SEARCH_URL}?name=${packageName}`)
-    console.log('result', result)
 
     const response: ArchPackageSearchResource = await result.json()
     return (
@@ -89,7 +78,6 @@ export async function resolvePackageDependencies(packageName: string) {
     );
   }
   catch (ex) {
-    console.log('fetchError', ex)
     throw ex
   }
 }
